@@ -1,1 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text to Speech - BroCodeHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e2f;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
 
+        textarea {
+            width: 70%;
+            height: 150px;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            background: #4da6ff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #66b3ff;
+        }
+
+        a {
+            color: #66b3ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🗣 Text to Speech</h1>
+<p>Enter text below and press Play</p>
+
+<textarea id="text"></textarea><br>
+
+<button onclick="speak()">Play</button>
+
+<p><a href="index.html">⬅ Back to Home</a></p>
+
+<script>
+function speak() {
+    let text = document.getElementById("text").value;
+    if (!text) return alert("Please enter some text!");
+
+    let msg = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(msg);
+}
+</script>
+
+</body>
+</html>
