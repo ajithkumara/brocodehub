@@ -1,10 +1,16 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_from_directory
 from gtts import gTTS
 import io
-from pydub import AudioSegment  # pip install pydub
+import os
 
 app = Flask(__name__)
 
+# Route 1: Serve the main page
+@app.route("/")
+def home():
+    return send_from_directory(".", "tts.html")  # reads tts.html from current dir
+
+# Route 2: TTS API
 @app.route("/tts")
 def tts():
     text = request.args.get("text", "").strip()
@@ -12,32 +18,23 @@ def tts():
         return {"error": "No text provided"}, 400
 
     try:
-        # Step 1: Generate MP3 in memory
         mp3_fp = io.BytesIO()
         tts = gTTS(text=text, lang="en", slow=False)
         tts.write_to_fp(mp3_fp)
-        mp3_fp.seek(0)
-
-        # Step 2: Convert MP3 → WAV (for browser compatibility)
-        audio = AudioSegment.from_file(mp3_fp, format="mp3")
-        wav_fp = io.BytesIO()
-        audio.export(wav_fp, format="wav")
-        wav_fp.seek(0)
-
-        # Step 3: Stream WAV response
-        def generate():
-            wav_fp.seek(0)
-            yield from wav_fp
+        mp3_data = mp3_fp.getvalue()
 
         return Response(
-            generate(),
-            mimetype="audio/wav",
+            mp3_data,
+            mimetype="audio/mpeg",
             headers={
-                "Content-Disposition": 'inline; filename="speech.wav"',
+                "Content-Length": str(len(mp3_data)),
                 "Accept-Ranges": "bytes",
             }
         )
-
     except Exception as e:
-        print("TTS ERROR:", e)
+        print("❌ TTS ERROR:", e)
         return {"error": str(e)}, 500
+
+if __name__ == "__main__":
+    # Ensure tts.html is in the same folder as app.py
+    app.run(host="127.0.0.1", port=5000, debug=True)
