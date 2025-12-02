@@ -51,7 +51,7 @@
 
 <script>
 function speakText() {
-    let text = document.getElementById("tts-input").value;
+    let text = document.getElementById("ttsInput").value; // match ID
     const audio = new Audio(`/tts?text=${encodeURIComponent(text)}`);
 
     audio.addEventListener("error", (e) => {
