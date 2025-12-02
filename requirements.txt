@@ -1,4 +1,4 @@
 flask
 gTTS
 soundfile
-pyaudio
+
