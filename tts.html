@@ -21,43 +21,24 @@
 
 <script>
 function speakText() {
-    const text = document.getElementById("ttsInput").value;
-    const btn = document.getElementById("speakBtn");
-    const status = document.getElementById("status");
-
+    const text = document.getElementById("ttsInput").value.trim();
     if (!text) {
-        alert("Please enter some text");
+        alert("Please enter some text.");
         return;
     }
 
-    status.innerText = "Loading audio...";
-    btn.disabled = true;
-
-    // FIX 1: Corrected Template Literal Syntax (Backticks)
-    // FIX 2: added http://127.0.0.1:5000 to ensure it finds the server even if you open HTML from desktop
-    const url = `http://127.0.0.1:5000/tts?text=${encodeURIComponent(text)}&t=${new Date().getTime()}`;
-
+    const url = `/tts?text=${encodeURIComponent(text)}`;
     const audio = new Audio(url);
 
-    // Play when data is loaded
-    audio.oncanplaythrough = () => {
-        status.innerText = "Playing...";
-        audio.play().catch(e => {
-            status.innerText = "Playback error: " + e.message;
-            console.error(e);
-        });
-    };
+    audio.addEventListener("error", (e) => {
+        console.error("Audio load error:", e);
+        alert("Failed to load audio. Check console.");
+    });
 
-    audio.onended = () => {
-        status.innerText = "";
-        btn.disabled = false;
-    };
-
-    audio.onerror = (e) => {
-        console.error("Audio Error", e);
-        status.innerText = "Error loading audio. Check console.";
-        btn.disabled = false;
-    };
+    audio.play().catch(err => {
+        console.error("Play failed:", err);
+        alert("Playback failed: " + err.message);
+    });
 }
 </script>
 </body>
