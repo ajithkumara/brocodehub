@@ -1,48 +1,29 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, request, send_file, jsonify
 from gtts import gTTS
-import soundfile as sf
-import os
+import io
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__)
 
-
-# -------------------------
-# HOME PAGE (index.html in root)
-# -------------------------
-@app.route('/')
-def home():
-    return app.send_static_file('index.html')
-
-
-# -------------------------
-# TEXT TO SPEECH PAGE
-# -------------------------
-@app.route('/tts')
-def tts_page():
-    return render_template("tts.html")
-
-
-@app.route('/tts/generate', methods=['POST'])
-def generate_tts():
-    text = request.form.get("text")
+@app.route("/tts")
+def tts():
+    text = request.args.get("text", "")
     if not text:
-        return "No text provided"
+        return jsonify({"error": "No text provided"}), 400
 
-    filename = "output.wav"
+    try:
+        # Generate MP3 directly in memory
+        mp3_bytes = io.BytesIO()
+        tts = gTTS(text=text, lang="en")
+        tts.write_to_fp(mp3_bytes)
+        mp3_bytes.seek(0)
 
-    # Generate speech
-    tts = gTTS(text=text, lang='en')
-    tts.save(filename)
+        return send_file(
+            mp3_bytes,
+            mimetype="audio/mpeg",
+            as_attachment=False,
+            download_name="speech.mp3"
+        )
 
-    # Fix WAV format using soundfile
-    data, samplerate = sf.read(filename)
-    sf.write(filename, data, samplerate)
-
-    return send_file(filename, as_attachment=True)
-
-
-# -------------------------
-# RUN APP
-# -------------------------
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    except Exception as e:
+        print("TTS ERROR:", e)
+        return jsonify({"error": str(e)}), 500
