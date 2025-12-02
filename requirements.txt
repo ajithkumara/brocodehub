@@ -2,3 +2,4 @@ flask
 gTTS
 soundfile
 gunicorn
+flask-cors
