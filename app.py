@@ -18,10 +18,18 @@ def tts():
         return {"error": "No text provided"}, 400
 
     try:
+        print(f"✅ Processing TTS for: '{text[:30]}...'")  # Logs in Render
         mp3_fp = io.BytesIO()
-        tts = gTTS(text=text, lang="en", slow=False)
+
+        tts = gTTS(text=text[:100], lang="en", slow=False)  # ⚠️ Cap at 100 chars!
         tts.write_to_fp(mp3_fp)
         mp3_data = mp3_fp.getvalue()
+
+        print(f"✅ gTTS succeeded. MP3 size: {len(mp3_data)} bytes")
+
+        if len(mp3_data) < 100:
+            print("❌ Warning: MP3 too small — likely failed silently!")
+            return {"error": "TTS returned empty audio"}, 500
 
         return Response(
             mp3_data,
@@ -29,10 +37,14 @@ def tts():
             headers={
                 "Content-Length": str(len(mp3_data)),
                 "Accept-Ranges": "bytes",
+                "Cache-Control": "no-cache",
             }
         )
+
     except Exception as e:
-        print("❌ TTS ERROR:", e)
+        import traceback
+        print("❌ TTS EXCEPTION:")
+        traceback.print_exc()  # Full stack trace in logs
         return {"error": str(e)}, 500
 
 if __name__ == "__main__":
