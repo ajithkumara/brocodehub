@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, send_from_directory
+from flask import Flask, request, Response, send_file, send_from_directory, render_template, jsonify
 from gtts import gTTS
 import io
 import os
@@ -10,6 +10,15 @@ app = Flask(__name__)
 def home():
     return send_from_directory(".", "index.html")  # or "static", depending on structure
     #return send_from_directory(".", "tts.html")  # reads tts.html from current dir
+
+# ---------------------------
+# OPTIONAL TTS HTML PAGE
+# ---------------------------
+@app.route("/tts-page")
+def tts_page():
+    return render_template("tts.html")
+    # tts.html MUST be inside /templates folder
+
 
 # Route 2: TTS API
 @app.route("/tts")
