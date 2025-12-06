@@ -11,6 +11,10 @@ def home():
     return send_from_directory(".", "index.html")  # or "static", depending on structure
     #return send_from_directory(".", "tts.html")  # reads tts.html from current dir
 
+@app.route("/index")
+def home_index():
+    return send_from_directory(".", "index.html")
+
 @app.route("/yt-downloader")
 def yt_downloader_page():
     return send_from_directory(".", "yt-downloader.html")
