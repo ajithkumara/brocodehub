@@ -42,7 +42,7 @@ def tts():
         print(f"✅ Processing TTS for: '{text[:30]}...'")  # Logs in Render
         mp3_fp = io.BytesIO()
 
-        tts = gTTS(text=text[:100], lang="en", slow=False)  # ⚠️ Cap at 100 chars!
+        tts = gTTS(text=text[:5000], lang="en", slow=False)  # ⚠️ Cap at 100 chars!
         tts.write_to_fp(mp3_fp)
         mp3_data = mp3_fp.getvalue()
 
